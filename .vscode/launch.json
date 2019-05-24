@@ -4,6 +4,19 @@
       "type": "java",
       "name": "CodeLens (Launch) - App",
       "request": "launch",
+      "mainClass": "kr.osci.master.App",
+      "projectName": "master"
+    },
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - App",
+      "request": "launch",
+      "mainClass": "kr.osci.random.App"
+    },
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - App",
+      "request": "launch",
       "mainClass": "kr.osci.slave.App"
     }
   ]
