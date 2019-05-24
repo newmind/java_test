@@ -19,23 +19,43 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- eclipse.persistence-->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>4.3.10.Final</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <version>4.3.10.Final</version>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.16</version>
+    </dependency>
   </dependencies>
 
   <build>
+    <!--resource folder-->
+    <!-- <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources> -->
+
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
         <configuration>
-          <archive>
-            <manifest>
-              <mainClass>kr.osci.slave.App</mainClass>
-              <addClasspath>true</addClasspath>
-              <addExtensions>true</addExtensions>
-              <packageName>kr.osci.slave</packageName>
-            </manifest>
-          </archive>
+          <mainClass>kr.osci.random.App</mainClass>
         </configuration>
       </plugin>
     </plugins>
