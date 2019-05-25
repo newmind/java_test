@@ -9,8 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import kr.osci.jpa.TimeAndRandom;
-
 public class App {
 	private static EntityManager em;
 	private static Random random = new Random();
