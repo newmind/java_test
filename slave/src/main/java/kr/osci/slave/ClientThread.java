@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -24,20 +26,34 @@ public class ClientThread extends Thread {
         try {
             this.em = EMF.createEntityManager();
 
-            this.socket.setSoTimeout(1000);
+            // 1. thread blocking 방지, 
+            // 2. 받은 데이터에 대한 ACK를 reply 
+            this.socket.setSoTimeout(200);
+            
             InputStream in = socket.getInputStream();
             InputStreamReader isr = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(isr);
+            
+            OutputStream out = socket.getOutputStream();
+            OutputStreamWriter osr = new OutputStreamWriter(out);
 
+            String lastRecvDate = "";
             while (socket != null) {
                 String line = "";
                 try {
                     line = br.readLine();
                     System.out.println(line);
                     // format : "2019-05-25 01:30:25.982 19457190"
-                    String sDate = line.substring(0, 24);
+                    lastRecvDate = line.substring(0, 24);
                     int random = Integer.parseInt(line.substring(25));
+                    
                 } catch (SocketTimeoutException e) {
+                    if (!lastRecvDate.isEmpty()) {
+                        // ACK
+                        osr.write(lastRecvDate + "\n");
+                        osr.flush();
+                        lastRecvDate = "";
+                    }
                     continue;
                 } catch (StringIndexOutOfBoundsException | NumberFormatException e) {
                     System.out.println("[ERROR] Wrong format : " + line);
