@@ -61,14 +61,12 @@ public class ClientThread extends Thread {
                     ackHolds++;
                     if (ackHolds >= MAX_ACK_HOLDS) {
                         sendACK(lastRecvDate);
-                        lastRecvDate = "";
                         ackHolds = 0;
                     }
                 } catch (SocketTimeoutException e) {
-                    if (ackHolds > 0 && !lastRecvDate.isEmpty()) {
+                    if (ackHolds > 0) {
                         // ACK
                         sendACK(lastRecvDate);
-                        lastRecvDate = "";
                         ackHolds = 0;
                     }
                 } catch (ParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
