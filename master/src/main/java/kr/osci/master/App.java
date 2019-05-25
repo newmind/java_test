@@ -20,7 +20,7 @@ public class App {
 
     public static void main(String[] args) {
         System.out.println("Master started");
-        System.out.println("Press any key to stop.");
+        System.out.println("Press enter to stop.");
         
         
         try {
@@ -33,7 +33,8 @@ public class App {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        
+        emf.close();
+        System.out.println("Master ended");
         return;
     }
 

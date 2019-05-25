@@ -17,7 +17,7 @@ public class App {
 
     public static void main(String[] args) {
         System.out.println("Generator started");
-        System.out.println("Press a key to stop.");
+        System.out.println("Press enter to stop.");
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("time-and-random");
         em = emf.createEntityManager();
