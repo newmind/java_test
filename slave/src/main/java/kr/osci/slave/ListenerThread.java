@@ -3,15 +3,14 @@ package kr.osci.slave;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
-public class Listener extends Thread {
+public class ListenerThread extends Thread {
     private ServerSocket sockServer;
     private int port;
 
     private ClientThread threadClient;
     
-    public Listener(int port) {
+    public ListenerThread(int port) {
         this.port = port;
     }
     

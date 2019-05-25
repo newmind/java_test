@@ -13,7 +13,7 @@ public final class App {
         EMF emf = new EMF();
         emf.init();
         
-        Listener listener = new Listener(port);
+        ListenerThread listener = new ListenerThread(port);
         try {
             listener.start();
             
