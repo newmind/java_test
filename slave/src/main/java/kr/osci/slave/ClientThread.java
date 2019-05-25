@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 
 import kr.osci.slave.TimeAndRandom;
@@ -79,10 +80,17 @@ public class ClientThread extends Thread {
     }
     
     private void createTimeAndRandom(Date date, int random) {
-        em.getTransaction().begin();
-        TimeAndRandom timeAndRandom = new TimeAndRandom(date, random);
-        em.persist(timeAndRandom);
-        em.getTransaction().commit();
+        try {
+            //TODO: insert 부하 발생시, 배치로 처리 필요
+            em.getTransaction().begin();
+            TimeAndRandom timeAndRandom = new TimeAndRandom(date, random);
+            em.persist(timeAndRandom);
+            em.getTransaction().commit();
+        } catch (EntityExistsException e) {
+            //TODO: 중복된다면 처리 필요
+            System.out.println("[ERROR] 중복 데이터 저장 시도");
+            e.printStackTrace();
+        }
     }
     
     public void close() {
