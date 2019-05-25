@@ -9,6 +9,7 @@ public final class App {
 
     public static void main(String[] args) {
         System.out.println("Slave started");
+        System.out.println("Press enter to stop.");
         
         EMF emf = new EMF();
         emf.init();
