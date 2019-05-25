@@ -10,6 +10,9 @@ public final class App {
     public static void main(String[] args) {
         System.out.println("Slave started");
         
+        EMF emf = new EMF();
+        emf.init();
+        
         Listener listener = new Listener(port);
         try {
             listener.start();
@@ -19,9 +22,12 @@ public final class App {
                 Thread.sleep(1000);
             }
             listener.close();
-            listener.join();
+            listener.join(1000);
+            
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            emf.unInit();
         }
         System.out.println("Slave ended");
     }
