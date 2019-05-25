@@ -9,10 +9,17 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.persistence.EntityManager;
 
+import kr.osci.slave.TimeAndRandom;
+
 public class ClientThread extends Thread {
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");    
+
     private Socket socket;
     private EntityManager em;
     
@@ -47,6 +54,8 @@ public class ClientThread extends Thread {
                     lastRecvDate = line.substring(0, 24);
                     int random = Integer.parseInt(line.substring(25));
                     
+                    createTimeAndRandom(sdf.parse(lastRecvDate), random);
+                    
                 } catch (SocketTimeoutException e) {
                     if (!lastRecvDate.isEmpty()) {
                         // ACK
@@ -54,20 +63,26 @@ public class ClientThread extends Thread {
                         osr.flush();
                         lastRecvDate = "";
                     }
-                    continue;
-                } catch (StringIndexOutOfBoundsException | NumberFormatException e) {
+                } catch (ParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
                     System.out.println("[ERROR] Wrong format : " + line);
                     this.socket.close();
                     this.socket = null;
                     break;
                 } catch (SocketException e) {
                     break;
-                }
+                } 
             }                   
             
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } 
+    }
+    
+    private void createTimeAndRandom(Date date, int random) {
+        em.getTransaction().begin();
+        TimeAndRandom timeAndRandom = new TimeAndRandom(date, random);
+        em.persist(timeAndRandom);
+        em.getTransaction().commit();
     }
     
     public void close() {
