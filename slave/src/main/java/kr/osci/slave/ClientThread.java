@@ -88,7 +88,7 @@ public class ClientThread extends Thread {
             em.getTransaction().commit();
         } catch (EntityExistsException e) {
             //TODO: 중복된다면 처리 필요
-            System.out.println("[ERROR] 중복 데이터 저장 시도");
+            System.out.println("[ERROR] 중복 데이터 저장 시도 : " + sdf.format(date));
             e.printStackTrace();
         }
     }
