@@ -1,4 +1,4 @@
-package kr.osci.jpa;
+package kr.osci.random;
 
 import java.util.Date;
 
@@ -41,10 +41,10 @@ public class TimeAndRandom {
 	public void setRandom(int random) {
 		this.random = random;
 	}
-	
+
     @Override
     public String toString() {
         return create_time + "\t" + random;
     }
-    
+
 }

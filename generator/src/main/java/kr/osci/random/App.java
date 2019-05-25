@@ -10,33 +10,36 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 public class App {
-	private static EntityManager em;
-	private static Random random = new Random();
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private App() {}
 
-	public static void main(String[] args) {
-		System.out.println("Generator started");
-		System.out.println("Press a key to stop.");
+    private static EntityManager em;
+    private static Random random = new Random();
 
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("time-and-random");
-		em = emf.createEntityManager();
+    public static void main(String[] args) {
+        System.out.println("Generator started");
+        System.out.println("Press a key to stop.");
 
-		try {
-			while (System.in.available() == 0) {
-				createTimeAndRandom();
-				Thread.sleep(1000);
-			}
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-		em.close();
-		return;
-	}
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("time-and-random");
+        em = emf.createEntityManager();
 
-	private static void createTimeAndRandom() {
-		em.getTransaction().begin();
-		TimeAndRandom timeAndRandom = new TimeAndRandom(new Date(), random.nextInt());
-		em.persist(timeAndRandom);
-		em.getTransaction().commit();
-	}
+        try {
+            while (System.in.available() == 0) {
+                createTimeAndRandom();
+                Thread.sleep(1000);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        em.close();
+        emf.close();
+        System.out.println("Generator ended");
+        return;
+    }
+
+    private static void createTimeAndRandom() {
+        em.getTransaction().begin();
+        TimeAndRandom timeAndRandom = new TimeAndRandom(new Date(), random.nextInt());
+        em.persist(timeAndRandom);
+        em.getTransaction().commit();
+    }
 }
