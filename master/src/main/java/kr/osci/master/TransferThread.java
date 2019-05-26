@@ -35,6 +35,7 @@ public class TransferThread extends Thread {
     private Socket socket;
     private BufferedReader br;
     private OutputStreamWriter osr;
+    private boolean closed = false;
     
     public TransferThread(String host, int port) {
         this.host = host;
@@ -47,24 +48,26 @@ public class TransferThread extends Thread {
     public void run() {
         
         try {
-            while (isConnected()) {
-                String line = "";
-                try {
-                    line = br.readLine();
-                    
-                    Date ackDate = sdf.parse(line);
-                    this.saveACKDate(ackDate);
-                } catch (ParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
-                    System.out.println("[ERROR] Wrong format : " + line);
-                    this.close();
-                    break;
-                } catch (SocketTimeoutException e) {
+            while (!closed) {
+                while (isConnected()) {
+                    String line = "";
+                    try {
+                        line = br.readLine();
+                        
+                        Date ackDate = sdf.parse(line);
+                        System.out.println("received " + line);
+                        this.saveACKDate(ackDate);
+                    } catch (ParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
+                        System.out.println("[ERROR] Wrong format : " + line);
+                        this.close();
+                        break;
+                    } catch (SocketTimeoutException e) {
+                    }
                 }
-                
+                Thread.sleep(0);
             }
         
         } catch (Exception e) {
-            // TODO: handle exception
         }
     }
 
@@ -72,10 +75,12 @@ public class TransferThread extends Thread {
      * return : last sent date
      */
     public Date transferNewerData(Date lastDate) {
-//        if (!this.isConnected()) {
-//            if (!this.connectToServer())
-//                return lastDate;
-//        }
+        if (!this.isConnected()) {
+            if (!this.connectToServer())
+                return lastDate;
+            // 마지막 전송성공한 것부터 보낼수 있게 처리.
+            lastDate = loadACKDate();
+        }
         
         Date result = lastDate;
         List<TimeAndRandom> resultList = getNewerData(lastDate);
@@ -92,12 +97,14 @@ public class TransferThread extends Thread {
     }
 
     private List<TimeAndRandom> getNewerData(Date lastDate) {
+        final int MAX_FETCH_SIZE = 100;
+        
         EntityManager em = EMF.createEntityManager();
         em.getTransaction().begin();
         
         TypedQuery<TimeAndRandom> query = em.createQuery(
                 "SELECT t FROM TimeAndRandom t WHERE create_time > :lastACKDate ORDER BY create_time",
-                TimeAndRandom.class).setMaxResults(1000);
+                TimeAndRandom.class).setMaxResults(MAX_FETCH_SIZE);
         query.setParameter("lastACKDate", lastDate);
         List<TimeAndRandom> resultList = query.getResultList();
         
@@ -112,8 +119,8 @@ public class TransferThread extends Thread {
         }
         
         try {            
-            String data = String.format("%s %d\n", x.getCreate_time(), x.getRandom());
-            osr.write(sdf.format(data));
+            String data = String.format("%s %d\n", sdf.format(x.getCreate_time()), x.getRandom());
+            osr.write(data);
             osr.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -152,7 +159,8 @@ public class TransferThread extends Thread {
             socket = null;
         } catch (IOException e) {
             e.printStackTrace();
-        }       
+        }
+        closed = true;
     }
 
     private void saveACKDate(Date ackDate) {
@@ -195,8 +203,6 @@ public class TransferThread extends Thread {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        System.out.println("2019-05-26 17:44:33.072");
-        System.out.println(sdf.format(date));
         return date;
 
     }
