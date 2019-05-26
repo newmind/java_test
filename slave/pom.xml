@@ -21,7 +21,7 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- JPA -->
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -35,31 +35,23 @@
       <artifactId>hibernate-c3p0</artifactId>
       <version>${hibernate.version}</version>
     </dependency>
-    
+
     <!-- Database -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.16</version>
-    </dependency>      
+    </dependency>
   </dependencies>
 
   <build>
-    <!--resource folder-->
-    <!-- <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources> -->
-
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.6.0</version>
         <configuration>
-          <mainClass>kr.osci.random.App</mainClass>
+          <mainClass>kr.osci.slave.App</mainClass>
         </configuration>
       </plugin>
     </plugins>

@@ -9,46 +9,42 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <hibernate.version>4.3.6.Final</hibernate.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
+    <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- eclipse.persistence-->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>4.3.10.Final</version>
-    </dependency>
-
+    
+    <!-- JPA -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
-      <version>4.3.10.Final</version>
+      <version>${hibernate.version}</version>
     </dependency>
 
+    <!-- For connection pooling -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-c3p0</artifactId>
+      <version>${hibernate.version}</version>
+    </dependency>
+    
+    <!-- Database -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.16</version>
-    </dependency>
+    </dependency>   
   </dependencies>
 
   <build>
-    <!--resource folder-->
-    <!-- <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources> -->
-
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
