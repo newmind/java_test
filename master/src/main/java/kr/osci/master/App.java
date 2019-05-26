@@ -22,7 +22,7 @@ public class App {
         try {
             transferThread.start();
             
-            Date lastSentDate = loadACKDate();
+            Date lastSentDate = transferThread.loadACKDate();
             
             while (System.in.available() == 0) {
                 long startTime = System.currentTimeMillis();
@@ -40,19 +40,5 @@ public class App {
         }
         emf.unInit();
         System.out.println("Master ended");
-    }
-
-    /*
-     * 마지막으로 전송에 성공한 데이터의 시간
-     */
-    private static Date loadACKDate() {
-        try {
-            //TODO 저장된 마지막날짜 가져오기
-            return sdf.parse("2019-05-25 11:59:26.000");
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return new Date();
     }
 }
