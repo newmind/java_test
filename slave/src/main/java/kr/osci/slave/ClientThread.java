@@ -15,6 +15,11 @@ import java.util.Date;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import javax.persistence.RollbackException;
+
+import org.hibernate.exception.JDBCConnectionException;
+
 
 import kr.osci.slave.TimeAndRandom;
 
@@ -33,6 +38,10 @@ public class ClientThread extends Thread {
     public void run() {
         try {
             this.em = EMF.createEntityManager();
+//            if (!this.em.isOpen()) {
+//                this.close();
+//                return;
+//            }
 
             // 1. thread blocking 방지, 
             // 2. 받은 데이터에 대한 ACK를 reply 
@@ -56,12 +65,15 @@ public class ClientThread extends Thread {
                     lastRecvDate = line.substring(0, 24);
                     int random = Integer.parseInt(line.substring(25));
                     
-                    createTimeAndRandom(sdf.parse(lastRecvDate), random);
-                    
-                    ackHolds++;
-                    if (ackHolds >= MAX_ACK_HOLDS) {
-                        sendACK(lastRecvDate);
-                        ackHolds = 0;
+                    if (createTimeAndRandom(sdf.parse(lastRecvDate), random)) {
+                        ackHolds++;
+                        if (ackHolds >= MAX_ACK_HOLDS) {
+                            sendACK(lastRecvDate);
+                            ackHolds = 0;
+                        }
+                    } else {
+                        this.close();
+                        break;
                     }
                 } catch (SocketTimeoutException e) {
                     if (ackHolds > 0) {
@@ -71,13 +83,12 @@ public class ClientThread extends Thread {
                     }
                 } catch (ParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
                     System.out.println("[ERROR] Wrong format : " + line);
-                    this.socket.close();
-                    this.socket = null;
+                    this.close();
                     break;
                 } catch (SocketException e) {
                     break;
                 } 
-            }                   
+            }           
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -96,25 +107,41 @@ public class ClientThread extends Thread {
         }
     }
     
-    private void createTimeAndRandom(Date date, int random) {
+    private boolean createTimeAndRandom(Date date, int random) {
         try {
+            this.em = EMF.createEntityManager();
+            
             //TODO: insert 부하 발생시, 배치로 처리 필요
             em.getTransaction().begin();
             TimeAndRandom timeAndRandom = new TimeAndRandom(date, random);
             em.persist(timeAndRandom);
             em.getTransaction().commit();
+            
+            this.em.close();
+            return true;
         } catch (EntityExistsException e) {
             //TODO: 중복된다면 처리 필요
             System.out.println("[ERROR] 중복 데이터 저장 시도 : " + sdf.format(date));
             e.printStackTrace();
+        } catch (RollbackException e) {
+            System.out.println("RollbackException");
+            e.printStackTrace();
+        } catch (PersistenceException e) {
+            System.out.println("PersistenceException");
+            e.printStackTrace();
+        } catch (JDBCConnectionException e) {
+            System.out.println("JDBCConnectionException");
+            e.printStackTrace();
         }
+        return false;
     }
     
     public void close() {
         try {
             if (socket != null)
                 socket.close();
-            em.close();
+            if (em.isOpen())
+                em.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
