@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 public class App {
     private App() {}
     
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");    
-
+    private static TransferThread transferThread;
+    
     public static void main(String[] args) {
         System.out.println("Master started");
         System.out.println("Press enter to stop.");
@@ -21,50 +18,28 @@ public class App {
         EMF emf = new EMF();
         emf.init();
         
+        transferThread = new TransferThread("localhost", 5050); 
         try {
-            Date lastACKDate = loadACKDate();
+            transferThread.start();
+            
+            Date lastSentDate = loadACKDate();
             
             while (System.in.available() == 0) {
                 long startTime = System.currentTimeMillis();
 
-                lastACKDate = transferNewerData(lastACKDate);
+                lastSentDate = transferThread.transferNewerData(lastSentDate);
                 
                 long finishTime = System.currentTimeMillis();
                 Thread.sleep(Math.max(0, 1000 - (finishTime - startTime)));
             }
+            transferThread.close();
+            transferThread.join(1000);
+            
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         emf.unInit();
         System.out.println("Master ended");
-    }
-
-    private static Date transferNewerData(Date lastDate) {
-        Date result = lastDate;
-
-        List<TimeAndRandom> resultList = getNewerData(lastDate);
-        
-        resultList.forEach(System.out::println);
-        for (TimeAndRandom x: resultList) {
-            result = x.getCreate_time(); 
-        }
-        
-        return result;
-    }
-
-    private static List<TimeAndRandom> getNewerData(Date lastDate) {
-        EntityManager em = EMF.createEntityManager();
-        System.out.println("getNewerData - " + em.toString());
-        
-        TypedQuery<TimeAndRandom> query = em.createQuery(
-                "SELECT t FROM TimeAndRandom t WHERE create_time > :lastACKDate",
-//                "SELECT t FROM TimeAndRandom t ORDER BY create_time DESC",
-                TimeAndRandom.class).setMaxResults(30);
-        query.setParameter("lastACKDate", lastDate);
-        List<TimeAndRandom> resultList = query.getResultList();
-        
-        em.close();
-        return resultList;
     }
 
     /*
