@@ -93,6 +93,7 @@ public class TransferThread extends Thread {
 
     private List<TimeAndRandom> getNewerData(Date lastDate) {
         EntityManager em = EMF.createEntityManager();
+        em.getTransaction().begin();
         
         TypedQuery<TimeAndRandom> query = em.createQuery(
                 "SELECT t FROM TimeAndRandom t WHERE create_time > :lastACKDate ORDER BY create_time",
@@ -100,19 +101,7 @@ public class TransferThread extends Thread {
         query.setParameter("lastACKDate", lastDate);
         List<TimeAndRandom> resultList = query.getResultList();
         
-//        Query q = em.createNativeQuery("SELECT count(*) FROM random_src t WHERE create_time > :lastACKDate");
-//        q.setParameter("lastACKDate", lastDate);
-//        BigInteger count = (BigInteger) q.getSingleResult();
-//        System.out.println("count " + count);
-//        
-//        {
-//            Query q2 = em.createNativeQuery("SELECT create_time, random FROM random_src t WHERE create_time > :lastACKDate");
-//            q2.setParameter("lastACKDate", lastDate);
-//            List result = q2.getResultList();
-//            System.out.println("count " + result.size());
-//        }
-
-        em.clear();
+        em.getTransaction().commit();
         em.close();
         return resultList;
     }
