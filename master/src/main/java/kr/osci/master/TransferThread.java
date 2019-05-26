@@ -1,9 +1,14 @@
 package kr.osci.master;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +22,9 @@ public class TransferThread extends Thread {
     private String host;
     private int port;
     private Socket socket;
-   
+    private BufferedReader br;
+    private OutputStreamWriter osr;
+    
     public TransferThread(String host, int port) {
         this.host = host;
         this.port = port;
@@ -26,7 +33,26 @@ public class TransferThread extends Thread {
     @Override
     public void run() {
         
-        super.run();
+        try {
+            while (isConnected()) {
+                String line = "";
+                try {
+                    line = br.readLine();
+                    
+                    Date ackDate = sdf.parse(line);
+                    // TODO: save
+                } catch (ParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
+                    System.out.println("[ERROR] Wrong format : " + line);
+                    this.close();
+                    break;
+                } catch (SocketTimeoutException e) {
+                }
+                
+            }
+        
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 
     /*
@@ -56,10 +82,7 @@ public class TransferThread extends Thread {
             return false;
         }
         
-        try {
-            OutputStream out = socket.getOutputStream();
-            OutputStreamWriter osr = new OutputStreamWriter(out);
-            
+        try {            
             String data = String.format("%s %d\n", x.getCreate_time(), x.getRandom());
             osr.write(sdf.format(data));
             osr.flush();
@@ -75,6 +98,12 @@ public class TransferThread extends Thread {
     private boolean connectToServer() {
         try {
             Socket socket = new Socket(this.host, this.port);
+            socket.setSoTimeout(200);
+            
+            InputStream in = socket.getInputStream();
+            OutputStream out = socket.getOutputStream();
+            this.br = new BufferedReader(new InputStreamReader(in));
+            this.osr = new OutputStreamWriter(out);
             this.socket = socket;
             return true;
         } catch (IllegalArgumentException | IOException e) {
@@ -91,7 +120,7 @@ public class TransferThread extends Thread {
         EntityManager em = EMF.createEntityManager();
         
         TypedQuery<TimeAndRandom> query = em.createQuery(
-                "SELECT t FROM TimeAndRandom t WHERE create_time > :lastACKDate",
+                "SELECT t FROM TimeAndRandom t WHERE create_time > :lastACKDate ORDER BY create_time",
                 TimeAndRandom.class).setMaxResults(30);
         query.setParameter("lastACKDate", lastDate);
         List<TimeAndRandom> resultList = query.getResultList();
