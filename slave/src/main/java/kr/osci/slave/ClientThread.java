@@ -28,24 +28,22 @@ public class ClientThread extends Thread {
 
     private Socket socket;
     private EntityManager em;
+    private OutputStreamWriter osr;
     
     public ClientThread(Socket socket) {
-        super();
         this.socket = socket;
     }
 
     @Override
     public void run() {
         try {
-            this.em = EMF.createEntityManager();
-//            if (!this.em.isOpen()) {
-//                this.close();
-//                return;
-//            }
 
             // 1. thread blocking 방지, 
             // 2. 받은 데이터에 대한 ACK를 reply 
             this.socket.setSoTimeout(200);
+            
+            OutputStream out = socket.getOutputStream();
+            this.osr = new OutputStreamWriter(out);
             
             InputStream in = socket.getInputStream();
             InputStreamReader isr = new InputStreamReader(in);
@@ -97,9 +95,6 @@ public class ClientThread extends Thread {
 
     private void sendACK(String lastRecvDate) {
         try {
-            OutputStream out = socket.getOutputStream();
-            OutputStreamWriter osr = new OutputStreamWriter(out);
-            
             osr.write(lastRecvDate + "\n");
             osr.flush();
         } catch (IOException e) {
