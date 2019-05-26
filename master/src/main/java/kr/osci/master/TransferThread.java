@@ -1,11 +1,17 @@
 package kr.osci.master;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.text.ParseException;
@@ -14,10 +20,15 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+
 public class TransferThread extends Thread {
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private final String savedACKDateFile = "lastACK.dat"; 
+    
+    private EntityManager em;
     
     private String host;
     private int port;
@@ -28,6 +39,8 @@ public class TransferThread extends Thread {
     public TransferThread(String host, int port) {
         this.host = host;
         this.port = port;
+        
+//        this.em = EMF.createEntityManager();
     }
 
     @Override
@@ -40,7 +53,7 @@ public class TransferThread extends Thread {
                     line = br.readLine();
                     
                     Date ackDate = sdf.parse(line);
-                    // TODO: save
+                    this.saveACKDate(ackDate);
                 } catch (ParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
                     System.out.println("[ERROR] Wrong format : " + line);
                     this.close();
@@ -59,14 +72,15 @@ public class TransferThread extends Thread {
      * return : last sent date
      */
     public Date transferNewerData(Date lastDate) {
-        if (!this.isConnected()) {
-            if (!this.connectToServer())
-                return lastDate;
-        }
+//        if (!this.isConnected()) {
+//            if (!this.connectToServer())
+//                return lastDate;
+//        }
         
         Date result = lastDate;
         List<TimeAndRandom> resultList = getNewerData(lastDate);
-        resultList.forEach(System.out::println);
+        
+//        resultList.forEach(System.out::println);
 
         for (TimeAndRandom x: resultList) {
             if (!this.sendData(x))
@@ -75,6 +89,32 @@ public class TransferThread extends Thread {
         }
         
         return result;
+    }
+
+    private List<TimeAndRandom> getNewerData(Date lastDate) {
+        EntityManager em = EMF.createEntityManager();
+        
+        TypedQuery<TimeAndRandom> query = em.createQuery(
+                "SELECT t FROM TimeAndRandom t WHERE create_time > :lastACKDate ORDER BY create_time",
+                TimeAndRandom.class).setMaxResults(1000);
+        query.setParameter("lastACKDate", lastDate);
+        List<TimeAndRandom> resultList = query.getResultList();
+        
+//        Query q = em.createNativeQuery("SELECT count(*) FROM random_src t WHERE create_time > :lastACKDate");
+//        q.setParameter("lastACKDate", lastDate);
+//        BigInteger count = (BigInteger) q.getSingleResult();
+//        System.out.println("count " + count);
+//        
+//        {
+//            Query q2 = em.createNativeQuery("SELECT create_time, random FROM random_src t WHERE create_time > :lastACKDate");
+//            q2.setParameter("lastACKDate", lastDate);
+//            List result = q2.getResultList();
+//            System.out.println("count " + result.size());
+//        }
+
+        em.clear();
+        em.close();
+        return resultList;
     }
 
     private boolean sendData(TimeAndRandom x) {
@@ -115,20 +155,7 @@ public class TransferThread extends Thread {
     public boolean isConnected() {
         return socket != null && socket.isConnected() && !socket.isClosed();
     }
-    
-    private List<TimeAndRandom> getNewerData(Date lastDate) {
-        EntityManager em = EMF.createEntityManager();
         
-        TypedQuery<TimeAndRandom> query = em.createQuery(
-                "SELECT t FROM TimeAndRandom t WHERE create_time > :lastACKDate ORDER BY create_time",
-                TimeAndRandom.class).setMaxResults(30);
-        query.setParameter("lastACKDate", lastDate);
-        List<TimeAndRandom> resultList = query.getResultList();
-        
-        em.close();
-        return resultList;
-    }
-    
     public void close() {
         try {
             if (socket != null)
@@ -137,5 +164,51 @@ public class TransferThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }       
+    }
+
+    private void saveACKDate(Date ackDate) {
+        try {
+            FileOutputStream fos = new FileOutputStream(savedACKDateFile, false);
+            DataOutputStream dos = new DataOutputStream(fos);
+            
+            dos.writeUTF(sdf.format(ackDate));
+            
+            dos.flush();
+            dos.close();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /*
+     * 마지막으로 전송에 성공한 데이터의 시간
+     */
+    public Date loadACKDate() {
+        Date date = new Date();
+//        date.setTime(date.getTime() + date.getTimezoneOffset());
+        date.setMinutes(date.getMinutes()-10);
+        try {
+            FileInputStream fis = new FileInputStream(savedACKDateFile);
+            DataInputStream dis = new DataInputStream(fis);
+            
+            String sDate = dis.readUTF();
+            date = sdf.parse(sDate);
+            
+            dis.close();
+            fis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        System.out.println("2019-05-26 17:44:33.072");
+        System.out.println(sdf.format(date));
+        return date;
+
     }
 }

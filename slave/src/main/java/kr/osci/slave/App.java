@@ -27,9 +27,8 @@ public final class App {
             
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-        } finally {
-            emf.unInit();
         }
+        emf.unInit();
         System.out.println("Slave ended");
     }
 }
