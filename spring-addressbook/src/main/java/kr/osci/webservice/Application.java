@@ -1,4 +1,4 @@
-package kr.osci.addressbook;
+package kr.osci.webservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

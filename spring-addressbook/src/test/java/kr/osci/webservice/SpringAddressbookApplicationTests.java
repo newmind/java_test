@@ -1,4 +1,4 @@
-package kr.osci.addressbook;
+package kr.osci.webservice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
