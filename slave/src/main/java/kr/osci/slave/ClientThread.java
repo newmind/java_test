@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.JDBCConnectionException;
 
 
@@ -114,19 +115,28 @@ public class ClientThread extends Thread {
             
             this.em.close();
             return true;
+            
+        } catch (ConstraintViolationException e) {
+            System.out.println("[ERROR] #1 중복 데이터 저장 시도 : " + sdf.format(date));
+            return true;
         } catch (EntityExistsException e) {
-            //TODO: 중복된다면 처리 필요
-            System.out.println("[ERROR] 중복 데이터 저장 시도 : " + sdf.format(date));
-            e.printStackTrace();
+
+            System.out.println("[ERROR] #2 중복 데이터 저장 시도 : " + sdf.format(date));
+            return true;
         } catch (RollbackException e) {
-            System.out.println("RollbackException");
-            e.printStackTrace();
+            //TODO: 중복된다면, 성공으로 처리
+            System.out.println("[ERROR] #3 중복 데이터 저장 시도 : " + sdf.format(date));
+            return true;
         } catch (PersistenceException e) {
             System.out.println("PersistenceException");
             e.printStackTrace();
         } catch (JDBCConnectionException e) {
             System.out.println("JDBCConnectionException");
             e.printStackTrace();
+        } finally {
+            try {
+                this.em.close();
+            } catch (Exception e) { }
         }
         return false;
     }
@@ -135,8 +145,6 @@ public class ClientThread extends Thread {
         try {
             if (socket != null)
                 socket.close();
-            if (em.isOpen())
-                em.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
