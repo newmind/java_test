@@ -1,6 +1,6 @@
 
-DROP TABLE `test_random`.`random_src`;
+DROP TABLE `test_jgkim`.`random_src`;
 
-DROP TABLE `test_random`.`random_dst`;
+DROP TABLE `test_jgkim`.`random_dst`;
 
-DROP DATABASE `test_random`;
+DROP DATABASE `test_jgkim`;
