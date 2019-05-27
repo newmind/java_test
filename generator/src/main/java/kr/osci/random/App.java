@@ -25,7 +25,7 @@ public class App {
         try {
             while (System.in.available() == 0) {
                 createTimeAndRandom();
-                Thread.sleep(1000);
+                Thread.sleep(100);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

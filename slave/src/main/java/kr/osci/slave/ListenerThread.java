@@ -32,7 +32,7 @@ public class ListenerThread extends Thread {
             }
             
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Listen socket closed");
         }
     }
 

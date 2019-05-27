@@ -85,8 +85,6 @@ public class TransferThread extends Thread {
         Date result = lastDate;
         List<TimeAndRandom> resultList = getNewerData(lastDate);
         
-//        resultList.forEach(System.out::println);
-
         for (TimeAndRandom x: resultList) {
             if (!this.sendData(x))
                 break;
@@ -97,7 +95,7 @@ public class TransferThread extends Thread {
     }
 
     private List<TimeAndRandom> getNewerData(Date lastDate) {
-        final int MAX_FETCH_SIZE = 100;
+        final int MAX_FETCH_SIZE = 1000;
         
         EntityManager em = EMF.createEntityManager();
         em.getTransaction().begin();
@@ -182,11 +180,10 @@ public class TransferThread extends Thread {
     
     /*
      * 마지막으로 전송에 성공한 데이터의 시간
+     * 처음 시작하는 거라면, 현재 시간 리턴
      */
     public Date loadACKDate() {
         Date date = new Date();
-//        date.setTime(date.getTime() + date.getTimezoneOffset());
-        date.setMinutes(date.getMinutes()-10);
         try {
             FileInputStream fis = new FileInputStream(savedACKDateFile);
             DataInputStream dis = new DataInputStream(fis);

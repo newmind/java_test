@@ -58,7 +58,6 @@ public class ClientThread extends Thread {
                 String line = "";
                 try {
                     line = br.readLine();
-                    System.out.println(line);
                     
                     // format : "2019-05-25 01:30:25.982 19457190"
                     lastRecvDate = line.substring(0, 24);
@@ -113,25 +112,14 @@ public class ClientThread extends Thread {
             em.persist(timeAndRandom);
             em.getTransaction().commit();
             
-            this.em.close();
             return true;
-            
-        } catch (ConstraintViolationException e) {
-            System.out.println("[ERROR] #1 중복 데이터 저장 시도 : " + sdf.format(date));
-            return true;
-        } catch (EntityExistsException e) {
-
-            System.out.println("[ERROR] #2 중복 데이터 저장 시도 : " + sdf.format(date));
-            return true;
-        } catch (RollbackException e) {
-            //TODO: 중복된다면, 성공으로 처리
-            System.out.println("[ERROR] #3 중복 데이터 저장 시도 : " + sdf.format(date));
+        } catch (ConstraintViolationException | EntityExistsException |RollbackException e) {
+            // 중복된다면, 성공으로 처리
+            System.out.println("[WARN] 중복 데이터 저장 시도 : " + sdf.format(date));
             return true;
         } catch (PersistenceException e) {
-            System.out.println("PersistenceException");
             e.printStackTrace();
         } catch (JDBCConnectionException e) {
-            System.out.println("JDBCConnectionException");
             e.printStackTrace();
         } finally {
             try {
