@@ -150,4 +150,25 @@ master-slave 사이의 동작 방식은
 
 master 의 경우는 socket read 를 위한 별도의 스레드가 있고, slave 의 경우는 listen 을 위한 스레드와 접속한 client 용 스레드가 각각 있음
 
-# 5. 스트링부트 주소록 동작방식 설명 (생략)
+# 5. 스트링부트 주소록 동작방식 설명
+
+-   gradle, JPA, lombok
+-   테이블 생성 옵션은 screate-drop 으로 하여, 종료시 삭제되게 함.
+
+주요 REST Endpoint
+
+    GET /contacts
+        : 모든 주소록 얻기
+    POST /contacts
+        : 새로운 연락처 추가
+    PUT /contacts/{id}
+        : 특정 id 의 연락처 정보 수정
+    DELETE /contacts/{id}
+        : id 연락처 삭제
+
+JSON 데이터 필드는 아래 4가지
+
+    { "name": "some_name",
+      "phone": "",
+      "address": "",
+      "note": "" }
