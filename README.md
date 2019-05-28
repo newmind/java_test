@@ -2,9 +2,9 @@
 
 3개의 프로그램으로 구성됨
 
--   generator (DB 에 0.1초단위로 데이터 저장)
--   master (DB에서 데이터를 읽어서 slave 로 전송)
--   slave (master로부터 수신한 데이터를 DB에 저장)
+- generator (DB 에 0.1초단위로 데이터 저장)
+- master (DB에서 데이터를 읽어서 slave 로 전송)
+- slave (master로부터 수신한 데이터를 DB에 저장)
 
 ## 테스트를 위한 준비사항
 
@@ -12,10 +12,10 @@ mysql 은 따로 구동되고 있어야 함.
 접속 정보와 계정은 아래의 파일들에서 바꿔줘야 함.
 기본으로 localhost 의 root / 1234 로 접근함.
 
--   generator/src/main/resources/META-INF/persistence.xml
--   master/src/main/resources/META-INF/persistence.xml
--   slave/src/main/resources/META-INF/persistence.xml
--   spring-addressbook/src/main/resources/application.properties
+- generator/src/main/resources/META-INF/persistence.xml
+- master/src/main/resources/META-INF/persistence.xml
+- slave/src/main/resources/META-INF/persistence.xml
+- spring-addressbook/src/main/resources/application.properties
 
 ## 테스트 시작하기
 
@@ -70,7 +70,7 @@ mysql 은 따로 구동되고 있어야 함.
 
 7. generator 종료 후 테이블 복사 내역 비교
 
--   generator 터미널에서 [Enter]
+- generator 터미널에서 [Enter] 로 종료
 
 ```sql
 select * from test_jgkim.random_src
@@ -131,15 +131,15 @@ JSON 데이터 필드는 아래 4가지이다
 
 주요 가정 :
 
--   master와 slave 는 각각 하나씩만 존재한다.
--   데이터의 [날짜시간]은 중복될 수 없음(하나의 master 가 0.1초 단위로 생성)
--   db 가 종료된 상황에 대한 테스트는 하지 않음
--   데이터가 0.1초 단위로 생성되는데, 정밀도 낮아서 오차발생할수 있음
+- master와 slave 는 각각 하나씩만 존재한다.
+- 데이터의 [날짜시간]은 중복될 수 없음(하나의 master 가 0.1초 단위로 생성)
+- db 가 종료된 상황에 대한 테스트는 하지 않음
+- 데이터가 0.1초 단위로 생성되는데, 정밀도 낮아서 오차발생할수 있음
 
 전송포맷은 [날짜시간 랜덤정수\n] 형식임
 
-    2019-05-25 01:30:25.982 19457190\n
-    2019-05-25 01:30:26.082 -976451\n
+    2019-05-27 01:30:25.982 19457190\n
+    2019-05-27 01:30:26.082 -976451\n
     ...
 
 master-slave 사이의 동작 방식은
@@ -152,8 +152,8 @@ master 의 경우는 socket read 를 위한 별도의 스레드가 있고, slave
 
 # 5. 스트링부트 주소록 동작방식 설명
 
--   gradle, JPA, lombok
--   테이블 생성 옵션은 screate-drop 으로 하여, 종료시 삭제되게 함.
+- gradle, JPA, lombok
+- 테이블 생성 옵션은 screate-drop 으로 하여, 종료시 삭제되게 함.
 
 주요 REST Endpoint
 
