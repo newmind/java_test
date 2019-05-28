@@ -23,7 +23,6 @@ import org.hibernate.exception.ConstraintViolationException;
 import kr.osci.slave.TimeAndRandom;
 
 public class ClientThread extends Thread {
-    // private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     private Socket socket;
@@ -59,8 +58,8 @@ public class ClientThread extends Thread {
                     line = br.readLine();
 
                     // format : "2019-05-25 01:30:25.982 19457190"
-                    lastRecvDate = line.substring(0, 24);
-                    int random = Integer.parseInt(line.substring(25));
+                    lastRecvDate = line.substring(0, 23);
+                    int random = Integer.parseInt(line.substring(24));
 
                     LocalDateTime localDate = LocalDateTime.parse(lastRecvDate, dtf);
                     if (createTimeAndRandom(localDate, random)) {
@@ -82,6 +81,7 @@ public class ClientThread extends Thread {
                 } catch (DateTimeParseException | StringIndexOutOfBoundsException | NumberFormatException e) {
                     System.out.println("[ERROR] Wrong format : " + line);
                     this.close();
+                    e.printStackTrace();
                     break;
                 } catch (SocketException e) {
                     break;
@@ -106,14 +106,14 @@ public class ClientThread extends Thread {
         try {
             this.em = EMF.createEntityManager();
 
-            //TODO: insert 부하 발생시, 배치로 처리 필요
+            // TODO: insert 부하 발생시, 배치로 처리 필요
             em.getTransaction().begin();
             TimeAndRandom timeAndRandom = new TimeAndRandom(date, random);
             em.persist(timeAndRandom);
             em.getTransaction().commit();
 
             return true;
-        } catch (ConstraintViolationException | EntityExistsException |RollbackException e) {
+        } catch (ConstraintViolationException | EntityExistsException | RollbackException e) {
             // 중복된다면, 성공으로 처리
             System.out.println("[WARN] 중복 데이터 저장 시도 : " + date.format(dtf));
             return true;
@@ -122,7 +122,8 @@ public class ClientThread extends Thread {
         } finally {
             try {
                 this.em.close();
-            } catch (Exception e) { }
+            } catch (Exception e) {
+            }
         }
         return false;
     }
