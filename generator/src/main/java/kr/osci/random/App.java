@@ -1,8 +1,7 @@
 package kr.osci.random;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 import javax.persistence.EntityManager;
@@ -38,7 +37,7 @@ public class App {
 
     private static void createTimeAndRandom() {
         em.getTransaction().begin();
-        TimeAndRandom timeAndRandom = new TimeAndRandom(new Date(), random.nextInt());
+        TimeAndRandom timeAndRandom = new TimeAndRandom(LocalDateTime.now(), random.nextInt());
         em.persist(timeAndRandom);
         em.getTransaction().commit();
     }
