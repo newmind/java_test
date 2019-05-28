@@ -7,13 +7,13 @@ http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" version="2.1">
     <properties>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
       <!-- mysqld 의 timezone 에 따라서 변경 필요 /> -->
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/test_jgkim?serverTimezone=Asia/Seoul" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/test_jgkim?serverTimezone=Asia/Seoul&amp;createDatabaseIfNotExist=true" />
       <property name="javax.persistence.jdbc.user" value="root" />
       <property name="javax.persistence.jdbc.password" value="1234" />
       <property name="hibernate.show_sql" value="true" />
       <property name="hibernate.format_sql" value="true" />
       <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
-      <property name="hibernate.hbm2ddl.auto" value="validate" />
+      <property name="hibernate.hbm2ddl.auto" value="create-only" />
     </properties>
   </persistence-unit>
 
