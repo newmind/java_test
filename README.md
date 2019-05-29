@@ -118,7 +118,7 @@ JSON 데이터 필드는 아래 4가지이다
 > curl -X DELETE -i http://localhost:8080/contacts/1
 ```
 
-    VS Code 상에서 테스트하려면 "REST Client" 확장을 설치후, [test.http](spring-addressbook/src/test/test.http) 에서 테스트 가능
+    VS Code 상에서 테스트하려면 "REST Client" 확장을 설치후, test.http 파일(spring-addressbook/src/test/test.http) 에서 테스트 가능
 
 # 3. 테스트 종료
 
