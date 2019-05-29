@@ -1,0 +1,25 @@
+### LIST ALL
+GET http://localhost:8080/contacts
+
+### CREATE
+POST http://localhost:8080/contacts HTTP/1.1
+content-type: application/json
+
+{
+  "name": "osci",
+  "phone": "02-555-1234"
+}
+
+### UPDATE
+PUT http://localhost:8080/contacts/1 HTTP/1.1
+content-type: application/json
+
+{
+  "name": "osci-kr",
+  "phone": "+82 2-555-1234",
+  "address": "Seoul, Korea",
+  "note": "open source consulting"
+}
+
+### DELETE
+DELETE http://localhost:8080/contacts/1

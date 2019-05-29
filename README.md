@@ -101,22 +101,24 @@ JSON 데이터 필드는 아래 4가지이다
 
 ```sh
 # 새로운 연락처 등록
-> curl -X POST \
+> curl -X POST -i \
     -H "Content-Type: application/json" \
     -d '{"name":"osci","phone":"02-555-1234"}' \
     http://localhost:8080/contacts
 # 연락처 전체 보기
-> curl http://localhost:8080/contacts
+> curl -i http://localhost:8080/contacts
 # 특정 연락처의 전화번호 수정
-> curl -X PUT \
+> curl -X PUT -i \
     -H "Content-Type: application/json" \
     -d '{"phone":"01055550000"}' \
     http://localhost:8080/contacts/1
 # 특정 연락처만 보기
-> curl http://localhost:8080/contacts/1
+> curl -i http://localhost:8080/contacts/1
 # 특정 연락처 삭제
-> curl -X DELETE http://localhost:8080/contacts/1
+> curl -X DELETE -i http://localhost:8080/contacts/1
 ```
+
+    VS Code 상에서 테스트하려면 "REST Client" 확장을 설치후, [test.http](spring-addressbook/src/test/test.http) 에서 테스트 가능
 
 # 3. 테스트 종료
 
