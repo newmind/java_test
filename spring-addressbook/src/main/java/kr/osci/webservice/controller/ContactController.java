@@ -49,7 +49,10 @@ public class ContactController {
 
     // 해당 ID의 Contact 지우기 (DELETE /contacts/{id})
     @DeleteMapping(value = "/{id}")
-    public void delete(@PathVariable Long id) {
-        repository.deleteById(id);
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        return repository.findById(id).map(record -> {
+            repository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 }
