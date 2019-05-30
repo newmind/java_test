@@ -31,7 +31,7 @@ mysql 은 따로 구동되고 있어야 함.
 ```sh
 # 새로운 터미널에서
 > cd slave
->> mvn exec:java
+> mvn exec:java
 ```
 
 3. master 실행 (random_src 테이블에서 데이터를 읽어서 slave 로 전송)
@@ -39,7 +39,7 @@ mysql 은 따로 구동되고 있어야 함.
 ```sh
 # 새로운 터미널에서
 > cd master
->> mvn exec:java
+> mvn exec:java
 ```
 
 4. generator 실행 (random_src 에 0.1초단위로 데이터 저장)
@@ -55,8 +55,8 @@ mysql 은 따로 구동되고 있어야 함.
 ```sh
 # 위의 2번 터미널에서
 # [Enter] 눌러서 slave 프로그램 종료
-# 일정 시간 다시 아래 실행
->> mvn exec:java
+# 일정 시간 후 다시 아래 실행
+> mvn exec:java
 ```
 
 6. master 종료한 후 다시 실행
@@ -64,8 +64,8 @@ mysql 은 따로 구동되고 있어야 함.
 ```sh
 # 위의 3번 터미널에서
 # [Enter] 눌러서 master 프로그램 종료
-# 일정 시간 다시 아래 실행
->> mvn exec:java
+# 일정 시간 후 다시 아래 실행
+> mvn exec:java
 ```
 
 7. generator 종료 후 테이블 복사 내역 비교
@@ -155,7 +155,7 @@ master 의 경우는 socket read 를 위한 별도의 스레드가 있고, slave
 # 5. 스트링부트 주소록 동작방식 설명
 
 - gradle, JPA, lombok
-- 테이블 생성 옵션은 screate-drop 으로 하여, 종료시 삭제되게 함.
+- 테이블 생성 옵션은 create-drop 으로 하여, 종료시 삭제되게 함.
 
 주요 REST Endpoint
 
